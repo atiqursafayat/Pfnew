@@ -25,13 +25,35 @@ export function rotateSize(width: number, height: number, rotation: number) {
 }
 
 /**
+ * Resize image data to a new width and height
+ */
+export async function resizeImageData(imageData: ImageData, width: number, height: number) {
+	const resizeWidth = width;
+	const resizeHeight = height;
+	console.log(imageData.width, imageData.height);
+	const ibm = await window.createImageBitmap(imageData, 0, 0, imageData.width, imageData.height);
+	const canvas = document.createElement('canvas');
+	canvas.width = resizeWidth;
+	canvas.height = resizeHeight;
+	const ctx = canvas.getContext('2d');
+
+	if (!ctx) {
+		return null;
+	}
+
+	ctx.drawImage(ibm, 0, 0, resizeWidth, resizeHeight);
+	return ctx.getImageData(0, 0, resizeWidth, resizeHeight);
+}
+
+/**
  * This function was adapted from the one in the ReadMe of https://github.com/DominicTobias/react-image-crop
  */
 export default async function getCroppedImg(
 	imageSrc: string,
 	pixelCrop: { x: number; y: number; width: number; height: number },
 	rotation = 0,
-	flip = { horizontal: false, vertical: false }
+	flip = { horizontal: false, vertical: false },
+	desiredSize = { width: 400, height: 400 }
 ): Promise<string | null> {
 	const image = await createImage(imageSrc);
 	const canvas = document.createElement('canvas');
@@ -63,12 +85,20 @@ export default async function getCroppedImg(
 	// extract the cropped image using these values
 	const data = ctx.getImageData(pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height);
 
-	// set canvas width to final desired crop size - this will clear existing context
-	canvas.width = pixelCrop.width;
-	canvas.height = pixelCrop.height;
+	// Scale image data to desired size
+	const resizedData = await resizeImageData(data, desiredSize.width, desiredSize.height);
+	if (!resizedData) {
+		return null;
+	}
 
+	// set canvas width to final desired crop size - this will clear existing context
+	canvas.width = desiredSize.width;
+	canvas.height = desiredSize.height;
 	// paste generated rotate image at the top left corner
-	ctx.putImageData(data, 0, 0);
+	ctx.putImageData(resizedData, 0, 0);
+
+	// const imgUrl = new URL('./assets/content.png', import.meta.url).href;
+	// console.log(imgUrl);
 
 	// As Base64 string
 	// return canvas.toDataURL('image/jpeg');

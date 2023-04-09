@@ -40,7 +40,7 @@
 </script>
 
 <main class="flex flex-col items-center justify-center w-full h-full gap-4 p-4 mt-10">
-	<h1 class="font-bold text-4xl">Profile Masking</h1>
+	<h1 class="font-bold text-4xl">Profile Framing</h1>
 	<InputFile id="file" type="file" accept="image/*" bind:files on:change={onFileSelected} />
 	{#if image && !croppedImage}
 		<div class="relative w-full h-[400px]">
@@ -53,7 +53,7 @@
 
 	{#if image && !croppedImage}
 		<h2>Preview</h2>
-		<div class="h-[312px] w-[312px] relative border-2 border-slate-500 overflow-hidden">
+		<div class="h-[400px] w-[400px] relative border-2 border-slate-500 overflow-hidden">
 			<img class="prof-pic" src={previewImage} alt="Profile example" />
 		</div>
 	{/if}
