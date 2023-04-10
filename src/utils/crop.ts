@@ -1,3 +1,24 @@
+import { Branch } from '$lib/constants/branch';
+import CTSrc from '../lib/assets/CT.png';
+import DSScr from '../lib/assets/DS.png';
+import MKSrc from '../lib/assets/MK.png';
+import PGSrc from '../lib/assets/PG.png';
+
+async function selectImageFromBranch(branch: Branch) {
+	switch (branch) {
+		case Branch.MARKETING:
+			return await createImage(MKSrc);
+		case Branch.PROGRAMMING:
+			return await createImage(PGSrc);
+		case Branch.DESIGN:
+			return await createImage(DSScr);
+		case Branch.CONTENT:
+			return await createImage(CTSrc);
+		default:
+			return await createImage(CTSrc);
+	}
+}
+
 export function createImage(url: string): Promise<HTMLImageElement> {
 	return new Promise((resolve, reject) => {
 		const image = new Image();
@@ -6,6 +27,36 @@ export function createImage(url: string): Promise<HTMLImageElement> {
 		image.setAttribute('crossOrigin', 'anonymous'); // needed to avoid cross-origin issues on CodeSandbox
 		image.src = url;
 	});
+}
+
+export function toImageData(image: HTMLImageElement): ImageData {
+	const canvas = document.createElement('canvas');
+	canvas.width = image.width;
+	canvas.height = image.height;
+
+	const ctx = canvas.getContext('2d');
+	if (!ctx) {
+		throw new Error('Canvas context is null');
+	}
+
+	ctx.drawImage(image, 0, 0);
+	return ctx.getImageData(0, 0, image.width, image.height);
+}
+
+export function toHTMLImageElement(imageData: ImageData): HTMLImageElement {
+	const canvas = document.createElement('canvas');
+	canvas.width = imageData.width;
+	canvas.height = imageData.height;
+
+	const ctx = canvas.getContext('2d');
+	if (!ctx) {
+		throw new Error('Canvas context is null');
+	}
+
+	ctx.putImageData(imageData, 0, 0);
+	const image = new Image();
+	image.src = canvas.toDataURL();
+	return image;
 }
 
 export function getRadianAngle(degreeValue: number) {
@@ -30,7 +81,6 @@ export function rotateSize(width: number, height: number, rotation: number) {
 export async function resizeImageData(imageData: ImageData, width: number, height: number) {
 	const resizeWidth = width;
 	const resizeHeight = height;
-	console.log(imageData.width, imageData.height);
 	const ibm = await window.createImageBitmap(imageData, 0, 0, imageData.width, imageData.height);
 	const canvas = document.createElement('canvas');
 	canvas.width = resizeWidth;
@@ -51,11 +101,14 @@ export async function resizeImageData(imageData: ImageData, width: number, heigh
 export default async function getCroppedImg(
 	imageSrc: string,
 	pixelCrop: { x: number; y: number; width: number; height: number },
+	branch: Branch,
 	rotation = 0,
 	flip = { horizontal: false, vertical: false },
 	desiredSize = { width: 400, height: 400 }
 ): Promise<string | null> {
 	const image = await createImage(imageSrc);
+	// Prepare bedge
+	const badge = await selectImageFromBranch(branch);
 	const canvas = document.createElement('canvas');
 	const ctx = canvas.getContext('2d');
 
@@ -90,27 +143,16 @@ export default async function getCroppedImg(
 	if (!resizedData) {
 		return null;
 	}
+	const resizedImage = toHTMLImageElement(resizedData);
 
 	// set canvas width to final desired crop size - this will clear existing context
 	canvas.width = desiredSize.width;
 	canvas.height = desiredSize.height;
-	// paste generated rotate image at the top left corner
-	ctx.putImageData(resizedData, 0, 0);
 
-	// const imgUrl = new URL('./assets/content.png', import.meta.url).href;
-	// console.log(imgUrl);
+	// paste generated rotate image at the top left corner
+	ctx.drawImage(resizedImage, 0, 0, desiredSize.width, desiredSize.height);
+	ctx.drawImage(badge, 0, 0, desiredSize.width, desiredSize.height);
 
 	// As Base64 string
-	// return canvas.toDataURL('image/jpeg');
-
-	// As a blob
-	return new Promise((resolve, reject) => {
-		canvas.toBlob((file) => {
-			if (!file) {
-				reject(new Error('Canvas is empty'));
-				return;
-			}
-			resolve(URL.createObjectURL(file));
-		}, 'image/jpeg');
-	});
+	return canvas.toDataURL('image/jpeg');
 }
