@@ -1,38 +1,29 @@
-# create-svelte
+# Profile Frame
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+Add a profile frame to your profile.
 
-## Creating a project
+# Demo
 
-If you're seeing this, you've probably already done this step. Congrats!
+![Demo](./docs/demo.mov)
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+# Getting Started
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Clone the repository
 
 ```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+git clone git@github.com:saenyakorn/profile-frame.git
 ```
 
-## Building
-
-To create a production version of your app:
+Install dependencies
 
 ```bash
-npm run build
+pnpm install
 ```
 
-You can preview the production build with `npm run preview`.
+Start the dev server
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+```bash
+pnpm dev
+```
+
+The dev server will be running at [http://localhost:5173](http://localhost:5173)
