@@ -4,7 +4,8 @@ Add a profile frame to your profile.
 
 # Demo
 
-![Demo](./docs/demo.webm)
+[demo.webm](https://user-images.githubusercontent.com/33742791/230826401-c35861ab-54af-4857-be3e-c5983742cf12.webm)
+
 
 # Getting Started
 
