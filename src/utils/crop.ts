@@ -43,7 +43,7 @@ export function toImageData(image: HTMLImageElement): ImageData {
 	return ctx.getImageData(0, 0, image.width, image.height);
 }
 
-export function toHTMLImageElement(imageData: ImageData): HTMLImageElement {
+export async function toHTMLImageElement(imageData: ImageData): Promise<HTMLImageElement> {
 	const canvas = document.createElement('canvas');
 	canvas.width = imageData.width;
 	canvas.height = imageData.height;
@@ -54,9 +54,7 @@ export function toHTMLImageElement(imageData: ImageData): HTMLImageElement {
 	}
 
 	ctx.putImageData(imageData, 0, 0);
-	const image = new Image();
-	image.src = canvas.toDataURL();
-	return image;
+	return await createImage(canvas.toDataURL());
 }
 
 export function getRadianAngle(degreeValue: number) {
@@ -101,14 +99,11 @@ export async function resizeImageData(imageData: ImageData, width: number, heigh
 export default async function getCroppedImg(
 	imageSrc: string,
 	pixelCrop: { x: number; y: number; width: number; height: number },
-	branch: Branch,
 	rotation = 0,
 	flip = { horizontal: false, vertical: false },
 	desiredSize = { width: 400, height: 400 }
 ): Promise<string | null> {
 	const image = await createImage(imageSrc);
-	// Prepare bedge
-	const badge = await selectImageFromBranch(branch);
 	const canvas = document.createElement('canvas');
 	const ctx = canvas.getContext('2d');
 
@@ -143,7 +138,7 @@ export default async function getCroppedImg(
 	if (!resizedData) {
 		return null;
 	}
-	const resizedImage = toHTMLImageElement(resizedData);
+	const resizedImage = await toHTMLImageElement(resizedData);
 
 	// set canvas width to final desired crop size - this will clear existing context
 	canvas.width = desiredSize.width;
@@ -151,6 +146,29 @@ export default async function getCroppedImg(
 
 	// paste generated rotate image at the top left corner
 	ctx.drawImage(resizedImage, 0, 0, desiredSize.width, desiredSize.height);
+
+	// As Base64 string
+	return canvas.toDataURL('image/jpeg');
+}
+
+export async function addFrame(
+	imageSrc: string,
+	branch: Branch,
+	desiredSize = { width: 400, height: 400 }
+) {
+	const image = await createImage(imageSrc);
+	// Prepare bedge
+	const badge = await selectImageFromBranch(branch);
+	const canvas = document.createElement('canvas');
+	const ctx = canvas.getContext('2d');
+
+	if (!ctx) {
+		return null;
+	}
+
+	canvas.width = desiredSize.width;
+	canvas.height = desiredSize.height;
+	ctx.drawImage(image, 0, 0, desiredSize.width, desiredSize.height);
 	ctx.drawImage(badge, 0, 0, desiredSize.width, desiredSize.height);
 
 	// As Base64 string

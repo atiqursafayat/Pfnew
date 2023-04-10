@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Cropper from 'svelte-easy-crop';
-	import getCroppedImg from '../utils/crop';
+	import getCroppedImg, { addFrame } from '../utils/crop';
 	import Button from '../components/Button.svelte';
 	import InputFile from '../components/InputFile.svelte';
 	import Link from '../components/Link.svelte';
@@ -9,11 +9,11 @@
 
 	let image = '';
 	let croppedImage = '';
+	let croppedImageWithFrame: Promise<string | null>;
 	let crop = { x: 0, y: 0 };
 	let zoom = 1;
 	let files: FileList;
 	let pixelCrop = { x: 0, y: 0, width: 0, height: 0 };
-	let previewImage: string;
 	let branch: Branch = Branch.PROGRAMMING;
 
 	// Update the image data when a new file is selected
@@ -25,21 +25,28 @@
 				image = reader.result as string;
 			};
 			croppedImage = '';
+			croppedImageWithFrame = Promise.resolve(null);
 		}
 	}
 
 	async function previewCrop(e: CustomEvent) {
 		pixelCrop = e.detail.pixels;
-		const newImage = await getCroppedImg(image, pixelCrop, branch);
-		if (newImage) {
-			previewImage = newImage;
-		}
 	}
 
 	async function cropImage() {
-		const newImage = await getCroppedImg(image, pixelCrop, branch);
+		const newImage = await getCroppedImg(image, pixelCrop);
 		if (newImage) croppedImage = newImage;
 	}
+
+	async function frameImage(image: string, branch: Branch) {
+		if (typeof window !== 'undefined' && image && branch) {
+			const newImage = await addFrame(image, branch);
+			return newImage;
+		}
+		return null;
+	}
+
+	$: croppedImageWithFrame = frameImage(croppedImage, branch);
 </script>
 
 <main class="flex flex-col items-center justify-center w-full h-full gap-8 p-4 mt-10">
@@ -62,13 +69,15 @@
 		</div>
 	{/if} -->
 
-	{#if croppedImage}
-		<div class="flex flex-col gap-3 items-center">
-			<h1 class="font-bold text-4xl text-center">Result</h1>
-			<div class="border-2 border-slate-500">
-				<img src={croppedImage} alt="Cropped profile" />
+	{#await croppedImageWithFrame then data}
+		{#if data !== null}
+			<div class="flex flex-col gap-3 items-center">
+				<h1 class="font-bold text-4xl text-center">Result</h1>
+				<div class="border-2 border-slate-500">
+					<img src={data} alt="Cropped profile" />
+				</div>
+				<Link href={data} download="profile.png" class="w-full text-center">Download</Link>
 			</div>
-			<Link href={croppedImage} download="profile.png" class="w-full text-center">Download</Link>
-		</div>
-	{/if}
+		{/if}
+	{/await}
 </main>
