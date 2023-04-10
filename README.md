@@ -4,7 +4,7 @@ Add a profile frame to your profile.
 
 # Demo
 
-![Demo](./docs/demo.mov)
+![Demo](./docs/demo.webm)
 
 # Getting Started
 
