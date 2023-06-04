@@ -62,6 +62,11 @@
 		}
 	}
 
+	function recropImage() {
+		croppedImage = null;
+		croppedImageWithFrame = null;
+	}
+
 	// Initialize the preview image
 	onMount(async () => {
 		const previewImage = await createImage(PreviewSrc);
@@ -77,7 +82,7 @@
 </script>
 
 <main class="flex flex-col items-center justify-center w-full h-full gap-8 p-4 mt-10">
-	<h1 class="font-bold text-4xl">Profile Framing</h1>
+	<h1 class="font-bold text-4xl">Profile Frame</h1>
 	<div class="flex flex-col gap-2">
 		<BranchOption bind:value={branch} on:change={changeBranch} />
 		<InputFile id="file" type="file" accept="image/*" bind:files on:change={onFileSelected} />
@@ -86,16 +91,9 @@
 	{#if image && !croppedImage}
 		<Cropper {image} bind:crop bind:zoom on:cropcomplete={previewCrop} aspect={1} />
 		<div class="absolute bottom-4 z-50">
-			<Button on:click={() => cropImage(image, pixelCrop)}>Crop Image</Button>
+			<Button on:click={() => cropImage(image, pixelCrop)}>Crop image</Button>
 		</div>
 	{/if}
-
-	<!-- {#if image && !croppedImage}
-		<h2>Preview</h2>
-		<div class="h-[400px] w-[400px] relative border-2 border-slate-500 overflow-hidden">
-			<img class="prof-pic" src={previewImage} alt="Profile example" />
-		</div>
-	{/if} -->
 
 	{#if croppedImageWithFrame}
 		<div class="flex flex-col gap-3 items-center">
@@ -105,6 +103,9 @@
 			</div>
 			<Link href={croppedImageWithFrame} download="profile.png" class="w-full text-center"
 				>Download</Link
+			>
+			<Button class="w-full text-center" variant="outlined" on:click={recropImage}
+				>Re-crop image</Button
 			>
 		</div>
 	{/if}

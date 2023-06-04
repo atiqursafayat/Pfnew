@@ -1,5 +1,5 @@
 <script lang="ts">
-	import clsx from 'clsx';
+	import { twMerge } from 'tailwind-merge';
 	import type { ChangeEventHandler, HTMLInputAttributes } from 'svelte/elements';
 
 	export let id: string;
@@ -21,17 +21,19 @@
 		{#if label}
 			<label
 				for={id}
-				class={clsx(
+				class={twMerge(
 					$$restProps.required && "after:content-['*'] after:text-red-500 after:ml-1 align-middle"
 				)}>{label}</label
 			>
 		{/if}
-		<div class={clsx('hover:border-blue-400', 'focus-within:border-blue-400', 'transition-colors')}>
+		<div
+			class={twMerge('hover:border-blue-400', 'focus-within:border-blue-400', 'transition-colors')}
+		>
 			<input
 				{id}
 				name={id}
 				type="file"
-				class={clsx(
+				class={twMerge(
 					'block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none',
 					'file:bg-transparent file:border-0 file:bg-gray-100 file:mr-4 file:py-3 file:px-4',
 					'hover:border-blue-400 focus-within:border-blue-400 transition-colors'
