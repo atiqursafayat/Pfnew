@@ -5,8 +5,8 @@ import MKSrc from '../lib/assets/MK.png';
 import PGSrc from '../lib/assets/PG.png';
 import resizeImageData from 'resize-image-data';
 
-const DEFAULT_WIDTH = 400;
-const DEFAULT_HEIGHT = 400;
+const DEFAULT_WIDTH = 720;
+const DEFAULT_HEIGHT = 720;
 
 async function selectImageFromBranch(branch: Branch) {
 	switch (branch) {

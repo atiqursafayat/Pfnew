@@ -19,6 +19,7 @@
 	// Update the image data when a new file is selected
 	function onFileSelected() {
 		if (files && files[0]) {
+			image = '';
 			const reader = new FileReader();
 			reader.readAsDataURL(files[0]);
 			reader.onload = () => {
@@ -38,7 +39,6 @@
 		const newImage = await getCroppedImg(image, pixelCrop);
 		if (newImage) {
 			croppedImage = newImage;
-			image = '';
 			croppedImageWithFrame = await frameImage(croppedImage, branch);
 		}
 	}
@@ -83,7 +83,7 @@
 		<div class="flex flex-col gap-3 items-center">
 			<h1 class="font-bold text-4xl text-center">Result</h1>
 			<div class="border-2 border-slate-500">
-				<img src={croppedImageWithFrame} alt="Cropped profile" />
+				<img src={croppedImageWithFrame} alt="Cropped profile" width="400" height="400" />
 			</div>
 			<Link href={croppedImageWithFrame} download="profile.png" class="w-full text-center"
 				>Download</Link
