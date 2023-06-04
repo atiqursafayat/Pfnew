@@ -8,8 +8,8 @@
 	import { Branch } from '$lib/constants/branch';
 
 	let image = '';
-	let croppedImage = '';
-	let croppedImageWithFrame: Promise<string | null>;
+	let croppedImage: string | null = null;
+	let croppedImageWithFrame: string | null = null;
 	let crop = { x: 0, y: 0 };
 	let zoom = 1;
 	let files: FileList;
@@ -24,8 +24,9 @@
 			reader.onload = () => {
 				image = reader.result as string;
 			};
-			croppedImage = '';
-			croppedImageWithFrame = Promise.resolve(null);
+			// Reset the crop
+			croppedImage = null;
+			croppedImageWithFrame = null;
 		}
 	}
 
@@ -35,7 +36,11 @@
 
 	async function cropImage() {
 		const newImage = await getCroppedImg(image, pixelCrop);
-		if (newImage) croppedImage = newImage;
+		if (newImage) {
+			croppedImage = newImage;
+			image = '';
+			croppedImageWithFrame = await frameImage(croppedImage, branch);
+		}
 	}
 
 	async function frameImage(image: string, branch: Branch) {
@@ -46,15 +51,20 @@
 		return null;
 	}
 
-	$: croppedImageWithFrame = frameImage(croppedImage, branch);
+	async function changeBranch() {
+		if (croppedImage) {
+			croppedImageWithFrame = await frameImage(croppedImage, branch);
+		}
+	}
 </script>
 
 <main class="flex flex-col items-center justify-center w-full h-full gap-8 p-4 mt-10">
 	<h1 class="font-bold text-4xl">Profile Framing</h1>
 	<div class="flex flex-col gap-2">
-		<BranchOption bind:value={branch} />
+		<BranchOption bind:value={branch} on:change={changeBranch} />
 		<InputFile id="file" type="file" accept="image/*" bind:files on:change={onFileSelected} />
 	</div>
+
 	{#if image && !croppedImage}
 		<Cropper {image} bind:crop bind:zoom on:cropcomplete={previewCrop} aspect={1} />
 		<div class="absolute bottom-4 z-50">
@@ -69,15 +79,15 @@
 		</div>
 	{/if} -->
 
-	{#await croppedImageWithFrame then data}
-		{#if data !== null}
-			<div class="flex flex-col gap-3 items-center">
-				<h1 class="font-bold text-4xl text-center">Result</h1>
-				<div class="border-2 border-slate-500">
-					<img src={data} alt="Cropped profile" />
-				</div>
-				<Link href={data} download="profile.png" class="w-full text-center">Download</Link>
+	{#if croppedImageWithFrame}
+		<div class="flex flex-col gap-3 items-center">
+			<h1 class="font-bold text-4xl text-center">Result</h1>
+			<div class="border-2 border-slate-500">
+				<img src={croppedImageWithFrame} alt="Cropped profile" />
 			</div>
-		{/if}
-	{/await}
+			<Link href={croppedImageWithFrame} download="profile.png" class="w-full text-center"
+				>Download</Link
+			>
+		</div>
+	{/if}
 </main>

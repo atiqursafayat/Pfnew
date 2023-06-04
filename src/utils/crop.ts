@@ -3,6 +3,10 @@ import CTSrc from '../lib/assets/CT.png';
 import DSScr from '../lib/assets/DS.png';
 import MKSrc from '../lib/assets/MK.png';
 import PGSrc from '../lib/assets/PG.png';
+import resizeImageData from 'resize-image-data';
+
+const DEFAULT_WIDTH = 400;
+const DEFAULT_HEIGHT = 400;
 
 async function selectImageFromBranch(branch: Branch) {
 	switch (branch) {
@@ -54,7 +58,7 @@ export async function toHTMLImageElement(imageData: ImageData): Promise<HTMLImag
 	}
 
 	ctx.putImageData(imageData, 0, 0);
-	return await createImage(canvas.toDataURL());
+	return await createImage(canvas.toDataURL('image/png', 1.0));
 }
 
 export function getRadianAngle(degreeValue: number) {
@@ -74,26 +78,6 @@ export function rotateSize(width: number, height: number, rotation: number) {
 }
 
 /**
- * Resize image data to a new width and height
- */
-export async function resizeImageData(imageData: ImageData, width: number, height: number) {
-	const resizeWidth = width;
-	const resizeHeight = height;
-	const ibm = await window.createImageBitmap(imageData, 0, 0, imageData.width, imageData.height);
-	const canvas = document.createElement('canvas');
-	canvas.width = resizeWidth;
-	canvas.height = resizeHeight;
-	const ctx = canvas.getContext('2d');
-
-	if (!ctx) {
-		return null;
-	}
-
-	ctx.drawImage(ibm, 0, 0, resizeWidth, resizeHeight);
-	return ctx.getImageData(0, 0, resizeWidth, resizeHeight);
-}
-
-/**
  * This function was adapted from the one in the ReadMe of https://github.com/DominicTobias/react-image-crop
  */
 export default async function getCroppedImg(
@@ -101,7 +85,7 @@ export default async function getCroppedImg(
 	pixelCrop: { x: number; y: number; width: number; height: number },
 	rotation = 0,
 	flip = { horizontal: false, vertical: false },
-	desiredSize = { width: 400, height: 400 }
+	desiredSize = { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
 ): Promise<string | null> {
 	const image = await createImage(imageSrc);
 	const canvas = document.createElement('canvas');
@@ -138,7 +122,9 @@ export default async function getCroppedImg(
 	if (!resizedData) {
 		return null;
 	}
-	const resizedImage = await toHTMLImageElement(resizedData);
+	const resizedImage = await toHTMLImageElement(
+		new ImageData(resizedData.data, desiredSize.width, desiredSize.height)
+	);
 
 	// set canvas width to final desired crop size - this will clear existing context
 	canvas.width = desiredSize.width;
@@ -148,13 +134,13 @@ export default async function getCroppedImg(
 	ctx.drawImage(resizedImage, 0, 0, desiredSize.width, desiredSize.height);
 
 	// As Base64 string
-	return canvas.toDataURL('image/jpeg');
+	return canvas.toDataURL('image/jpeg', 1.0);
 }
 
 export async function addFrame(
 	imageSrc: string,
 	branch: Branch,
-	desiredSize = { width: 400, height: 400 }
+	desiredSize = { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
 ) {
 	const image = await createImage(imageSrc);
 	// Prepare bedge
@@ -172,5 +158,5 @@ export async function addFrame(
 	ctx.drawImage(badge, 0, 0, desiredSize.width, desiredSize.height);
 
 	// As Base64 string
-	return canvas.toDataURL('image/jpeg');
+	return canvas.toDataURL('image/jpeg', 1.0);
 }
