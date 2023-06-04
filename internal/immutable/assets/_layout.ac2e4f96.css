@@ -432,8 +432,14 @@ video {
 .contents {
   display: contents;
 }
+.h-\[400px\] {
+  height: 400px;
+}
 .h-full {
   height: 100%;
+}
+.w-\[400px\] {
+  width: 400px;
 }
 .w-full {
   width: 100%;
@@ -487,6 +493,10 @@ video {
   --tw-bg-opacity: 1;
   background-color: rgb(67 56 202 / var(--tw-bg-opacity));
 }
+.bg-slate-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(241 245 249 / var(--tw-bg-opacity));
+}
 .bg-transparent {
   background-color: transparent;
 }
@@ -520,6 +530,10 @@ video {
 .text-4xl {
   font-size: 2.25rem;
   line-height: 2.5rem;
+}
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
 }
 .text-sm {
   font-size: 0.875rem;
