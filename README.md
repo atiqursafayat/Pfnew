@@ -4,15 +4,14 @@ Add a profile frame to your profile.
 
 # Demo
 
-[demo.webm](https://user-images.githubusercontent.com/33742791/230826401-c35861ab-54af-4857-be3e-c5983742cf12.webm)
-
+[demo.webm](https://github.com/WebmasterCamp/profile-frame/assets/33742791/f8d30e2b-7a2b-41c1-8be8-e49fef8f66c7)
 
 # Getting Started
 
 Clone the repository
 
 ```bash
-git clone git@github.com:saenyakorn/profile-frame.git
+git clone git@github.com:WebmasterCamp/profile-frame.git
 ```
 
 Install dependencies
