@@ -23,8 +23,8 @@
 	)}
 	bind:this={select}
 >
+	<option value="PG">Programming</option>
 	<option value="MK">Marketing</option>
 	<option value="CT">Content</option>
-	<option value="PG">Programming</option>
 	<option value="DS">Design</option>
 </select>

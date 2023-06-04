@@ -3,10 +3,12 @@ import CTSrc from '../lib/assets/CT.png';
 import DSScr from '../lib/assets/DS.png';
 import MKSrc from '../lib/assets/MK.png';
 import PGSrc from '../lib/assets/PG.png';
+import BGSrc from '../lib/assets/BG.png';
 import resizeImageData from 'resize-image-data';
 
 const DEFAULT_WIDTH = 720;
 const DEFAULT_HEIGHT = 720;
+const OFFSET = (720 - 640) / 2;
 
 async function selectImageFromBranch(branch: Branch) {
 	switch (branch) {
@@ -134,7 +136,7 @@ export default async function getCroppedImg(
 	ctx.drawImage(resizedImage, 0, 0, desiredSize.width, desiredSize.height);
 
 	// As Base64 string
-	return canvas.toDataURL('image/jpeg', 1.0);
+	return canvas.toDataURL('image/png', 1.0);
 }
 
 export async function addFrame(
@@ -142,9 +144,14 @@ export async function addFrame(
 	branch: Branch,
 	desiredSize = { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
 ) {
-	const image = await createImage(imageSrc);
-	// Prepare bedge
-	const badge = await selectImageFromBranch(branch);
+	// Prepare image, bedge, and background
+	const [image, badge, background] = await Promise.all([
+		createImage(imageSrc),
+		selectImageFromBranch(branch),
+		createImage(BGSrc)
+	]);
+
+	// Preoare background
 	const canvas = document.createElement('canvas');
 	const ctx = canvas.getContext('2d');
 
@@ -154,9 +161,16 @@ export async function addFrame(
 
 	canvas.width = desiredSize.width;
 	canvas.height = desiredSize.height;
-	ctx.drawImage(image, 0, 0, desiredSize.width, desiredSize.height);
+	ctx.drawImage(background, 0, 0, desiredSize.width, desiredSize.height);
+	ctx.drawImage(
+		image,
+		OFFSET,
+		OFFSET,
+		desiredSize.width - 2 * OFFSET,
+		desiredSize.height - 2 * OFFSET
+	);
 	ctx.drawImage(badge, 0, 0, desiredSize.width, desiredSize.height);
 
 	// As Base64 string
-	return canvas.toDataURL('image/jpeg', 1.0);
+	return canvas.toDataURL('image/png', 1.0);
 }

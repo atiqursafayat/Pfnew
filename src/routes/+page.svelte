@@ -1,11 +1,13 @@
 <script lang="ts">
 	import Cropper from 'svelte-easy-crop';
-	import getCroppedImg, { addFrame } from '../utils/crop';
+	import getCroppedImg, { addFrame, createImage } from '../utils/crop';
 	import Button from '../components/Button.svelte';
 	import InputFile from '../components/InputFile.svelte';
 	import Link from '../components/Link.svelte';
 	import BranchOption from '../components/BranchOption.svelte';
 	import { Branch } from '$lib/constants/branch';
+	import PreviewSrc from '$lib/assets/preview.png';
+	import { onMount } from 'svelte';
 
 	let image = '';
 	let croppedImage: string | null = null;
@@ -35,7 +37,10 @@
 		pixelCrop = e.detail.pixels;
 	}
 
-	async function cropImage() {
+	async function cropImage(
+		image: string,
+		pixelCrop: { x: number; y: number; width: number; height: number }
+	) {
 		const newImage = await getCroppedImg(image, pixelCrop);
 		if (newImage) {
 			croppedImage = newImage;
@@ -56,6 +61,19 @@
 			croppedImageWithFrame = await frameImage(croppedImage, branch);
 		}
 	}
+
+	// Initialize the preview image
+	onMount(async () => {
+		const previewImage = await createImage(PreviewSrc);
+		const size = 600;
+		await cropImage(PreviewSrc, {
+			x: (previewImage.width - size) / 2,
+			y: (previewImage.height - size) / 2,
+			width: size,
+			height: size
+		});
+		image = PreviewSrc;
+	});
 </script>
 
 <main class="flex flex-col items-center justify-center w-full h-full gap-8 p-4 mt-10">
@@ -68,7 +86,7 @@
 	{#if image && !croppedImage}
 		<Cropper {image} bind:crop bind:zoom on:cropcomplete={previewCrop} aspect={1} />
 		<div class="absolute bottom-4 z-50">
-			<Button on:click={cropImage}>Crop Image</Button>
+			<Button on:click={() => cropImage(image, pixelCrop)}>Crop Image</Button>
 		</div>
 	{/if}
 
@@ -82,7 +100,7 @@
 	{#if croppedImageWithFrame}
 		<div class="flex flex-col gap-3 items-center">
 			<h1 class="font-bold text-4xl text-center">Result</h1>
-			<div class="border-2 border-slate-500">
+			<div>
 				<img src={croppedImageWithFrame} alt="Cropped profile" width="400" height="400" />
 			</div>
 			<Link href={croppedImageWithFrame} download="profile.png" class="w-full text-center"
