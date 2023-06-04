@@ -95,9 +95,9 @@
 		</div>
 	{/if}
 
-	{#if croppedImageWithFrame}
-		<div class="flex flex-col gap-3 items-center">
-			<h1 class="font-bold text-4xl text-center">Result</h1>
+	<div class="flex flex-col gap-3 items-center">
+		<h1 class="font-bold text-4xl text-center">Result</h1>
+		{#if croppedImageWithFrame}
 			<div>
 				<img src={croppedImageWithFrame} alt="Cropped profile" width="400" height="400" />
 			</div>
@@ -107,6 +107,10 @@
 			<Button class="w-full text-center" variant="outlined" on:click={recropImage}
 				>Re-crop image</Button
 			>
-		</div>
-	{/if}
+		{:else}
+			<div class="w-[400px] h-[400px] flex items-center justify-center bg-slate-100">
+				<h1 class="text-lg">Loading...</h1>
+			</div>
+		{/if}
+	</div>
 </main>
