@@ -6,9 +6,9 @@ import PGSrc from '../lib/assets/PG.png';
 import BGSrc from '../lib/assets/BG.png';
 import resizeImageData from 'resize-image-data';
 
-const DEFAULT_WIDTH = 720;
-const DEFAULT_HEIGHT = 720;
-const OFFSET = (720 - 640) / 2;
+const DEFAULT_WIDTH = 1440;
+const DEFAULT_HEIGHT = 1440;
+const OFFSET = (1440 - 1280) / 2;
 
 async function selectImageFromBranch(branch: Branch) {
 	switch (branch) {
