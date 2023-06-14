@@ -82,7 +82,10 @@
 </script>
 
 <main class="flex flex-col items-center justify-center w-full h-full gap-8 p-4 mt-10">
-	<h1 class="font-bold text-4xl">Profile Frame</h1>
+	<div>
+		<h1 class="font-bold text-4xl text-center">Profile Frame</h1>
+		<p>Suggested profile size: 1280 x 1280</p>
+	</div>
 	<div class="flex flex-col gap-2">
 		<BranchOption bind:value={branch} on:change={changeBranch} />
 		<InputFile id="file" type="file" accept="image/*" bind:files on:change={onFileSelected} />
